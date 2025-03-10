@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2 text-center">
+            <h1 class="display-4">Welcome to Personal Finance Tracker</h1>
+            <p class="lead">Take control of your finances with our easy-to-use finance tracking application</p>
+            
+            <div class="mt-5">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg me-3">
+                        <i class="fas fa-chart-line me-2"></i> Go to Dashboard
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-primary btn-lg me-3">
+                        <i class="fas fa-sign-in-alt me-2"></i> Login
+                    </a>
+                    <a href="{% url 'register' %}" class="btn btn-outline-primary btn-lg">
+                        <i class="fas fa-user-plus me-2"></i> Register
+                    </a>
+                {% endif %}
+            </div>
+            
+            <div class="row mt-5">
+                <div class="col-md-4">
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-money-bill-wave fa-3x text-primary mb-3"></i>
+                            <h5 class="card-title">Track Expenses</h5>
+                            <p class="card-text">Record and categorize your expenses to understand your spending habits.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-chart-pie fa-3x text-primary mb-3"></i>
+                            <h5 class="card-title">Visual Reports</h5>
+                            <p class="card-text">Get visual insights into your financial data with charts and graphs.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card mb-4 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="fas fa-file-export fa-3x text-primary mb-3"></i>
+                            <h5 class="card-title">Export Data</h5>
+                            <p class="card-text">Export your financial data for use with other tools or for backup.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

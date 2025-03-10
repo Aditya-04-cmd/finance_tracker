@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% block title %}Categories - Personal Finance Tracker{% endblock %}
+{% block categories_active %}active{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Categories</h2>
+        <a href="{% url 'add_category' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Category
+        </a>
+    </div>
+    
+    <div class="row">
+        <!-- Income Categories -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Income Categories</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% with income_categories=categories|filter_by_type:'income' %}
+                        {% if income_categories %}
+                            <ul class="list-group list-group-flush">
+                                {% for category in income_categories %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>{{ category.name }}</span>
+                                        <div>
+                                            <a href="{% url 'edit_category' category.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'delete_category' category.id %}" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-tags fa-3x text-muted mb-3"></i>
+                                <p>No income categories found.</p>
+                                <a href="{% url 'add_category' %}" class="btn btn-success btn-sm">
+                                    <i class="fas fa-plus"></i> Add Income Category
+                                </a>
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Expense Categories -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">Expense Categories</h5>
+                </div>
+                <div class="card-body p-0">
+                    {% with expense_categories=categories|filter_by_type:'expense' %}
+                        {% if expense_categories %}
+                            <ul class="list-group list-group-flush">
+                                {% for category in expense_categories %}
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>{{ category.name }}</span>
+                                        <div>
+                                            <a href="{% url 'edit_category' category.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <a href="{% url 'delete_category' category.id %}" class="btn btn-sm btn-outline-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </a>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <i class="fas fa-tags fa-3x text-muted mb-3"></i>
+                                <p>No expense categories found.</p>
+                                <a href="{% url 'add_category' %}" class="btn btn-danger btn-sm">
+                                    <i class="fas fa-plus"></i> Add Expense Category
+                                </a>
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

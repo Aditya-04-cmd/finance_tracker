@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Transactions - Personal Finance Tracker{% endblock %}
+{% block transactions_active %}active{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Transactions</h2>
+        <a href="{% url 'add_transaction' %}" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Add Transaction
+        </a>
+    </div>
+    
+    <!-- Filter Form -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Filter Transactions</h5>
+        </div>
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-3">
+                    {{ form.start_date|as_crispy_field }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.end_date|as_crispy_field }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.category|as_crispy_field }}
+                </div>
+                <div class="col-md-3">
+                    {{ form.transaction_type|as_crispy_field }}
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Apply Filters</button>
+                    <a href="{% url 'transaction_list' %}" class="btn btn-outline-secondary">Reset</a>
+                    <a href="{% url 'export_data' %}?{{ request.GET.urlencode }}" class="btn btn-outline-success float-end">
+                        <i class="fas fa-download"></i> Export Data
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Summary -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card summary-card income-card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Income</h5>
+                    <h2 class="card-text text-success">${{ total_income|floatformat:2 }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card summary-card expense-card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Expenses</h5>
+                    <h2 class="card-text text-danger">${{ total_expenses|floatformat:2 }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card summary-card balance-card">
+                <div class="card-body">
+                    <h5 class="card-title">Balance</h5>
+                    <h2 class="card-text {% if balance >= 0 %}text-primary{% else %}text-danger{% endif %}">
+                        ${{ balance|floatformat:2 }}
+                    </h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Transactions Table -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">Transaction List</h5>
+        </div>
+        <div class="card-body p-0">
+            {% if transactions %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Description</th>
+                                <th>Category</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for transaction in transactions %}
+                                <tr>
+                                    <td>{{ transaction.date|date:"M d, Y" }}</td>
+                                    <td>{{ transaction.description }}</td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ transaction.category.name }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge {% if transaction.transaction_type == 'expense' %}bg-danger{% else %}bg-success{% endif %}">
+                                            {{ transaction.transaction_type|title }}
+                                        </span>
+                                    </td>
+                                    <td class="{% if transaction.transaction_type == 'expense' %}text-danger{% else %}text-success{% endif %}">
+                                        {% if transaction.transaction_type == 'expense' %}-{% else %}+{% endif %}
+                                        ${{ transaction.amount|floatformat:2 }}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'edit_transaction' transaction.id %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{% url 'delete_transaction' transaction.id %}" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-receipt fa-3x text-muted mb-3"></i>
+                    <p>No transactions found matching your filters.</p>
+                    <a href="{% url 'add_transaction' %}" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Transaction
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

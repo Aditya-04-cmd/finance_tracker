@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Personal Finance Tracker{% endblock %}
+{% block dashboard_active %}active{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4">Financial Dashboard</h2>
+    
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card summary-card income-card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Income This Month</h5>
+                    <h2 class="card-text text-success">${{ current_month_income|floatformat:2 }}</h2>
+                    {% if last_month_income > 0 %}
+                        <p class="text-muted">Last Month: ${{ last_month_income|floatformat:2 }}</p>
+                        {% if current_month_income > last_month_income %}
+                            <p class="text-success">
+                                <i class="fas fa-arrow-up"></i> 
+                                {{ current_month_income|subtract:last_month_income|percentage:last_month_income|floatformat:1 }}% compared to last month
+                            </p>
+                        {% elif current_month_income < last_month_income %}
+                            <p class="text-danger">
+                                <i class="fas fa-arrow-down"></i> 
+                                {{ last_month_income|subtract:current_month_income|percentage:last_month_income|floatformat:1 }}% compared to last month
+                            </p>
+                        {% else %}
+                            <p class="text-muted">No change from last month</p>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card summary-card expense-card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Expenses This Month</h5>
+                    <h2 class="card-text text-danger">${{ current_month_expenses|floatformat:2 }}</h2>
+                    {% if last_month_expenses > 0 %}
+                        <p class="text-muted">Last Month: ${{ last_month_expenses|floatformat:2 }}</p>
+                        {% if current_month_expenses < last_month_expenses %}
+                            <p class="text-success">
+                                <i class="fas fa-arrow-down"></i> 
+                                {{ last_month_expenses|subtract:current_month_expenses|percentage:last_month_expenses|floatformat:1 }}% compared to last month
+                            </p>
+                        {% elif current_month_expenses > last_month_expenses %}
+                            <p class="text-danger">
+                                <i class="fas fa-arrow-up"></i> 
+                                {{ current_month_expenses|subtract:last_month_expenses|percentage:last_month_expenses|floatformat:1 }}% compared to last month
+                            </p>
+                        {% else %}
+                            <p class="text-muted">No change from last month</p>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card summary-card balance-card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Current Balance</h5>
+                    <h2 class="card-text {% if current_balance >= 0 %}text-primary{% else %}text-danger{% endif %}">
+                        ${{ current_balance|floatformat:2 }}
+                    </h2>
+                    {% if last_month_balance != 0 %}
+                        <p class="text-muted">Last Month: ${{ last_month_balance|floatformat:2 }}</p>
+                        {% if current_balance > last_month_balance %}
+                            <p class="text-success">
+                                <i class="fas fa-arrow-up"></i> 
+                                Improved from last month
+                            </p>
+                        {% elif current_balance < last_month_balance %}
+                            <p class="text-danger">
+                                <i class="fas fa-arrow-down"></i> 
+                                Decreased from last month
+                            </p>
+                        {% else %}
+                            <p class="text-muted">Same as last month</p>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Charts and Recent Transactions -->
+    <div class="row">
+        <!-- Charts -->
+        <div class="col-md-7">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Expenses by Category (Current Month)</h5>
+                </div>
+                <div class="card-body">
+                    {% if expense_chart %}
+                        <img src="data:image/png;base64,{{ expense_chart }}" class="img-fluid" alt="Expenses by Category">
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-chart-pie fa-3x text-muted mb-3"></i>
+                            <p>No expense data available for the current month.</p>
+                            <a href="{% url 'add_transaction' %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus"></i> Add Transaction
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Transactions -->
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Recent Transactions</h5>
+                    <a href="{% url 'transaction_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="card-body p-0">
+                    {% if recent_transactions %}
+                        <div class="list-group list-group-flush">
+                            {% for transaction in recent_transactions %}
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ transaction.description }}</h6>
+                                        <small class="text-muted">{{ transaction.date|date:"M d" }}</small>
+                                    </div>
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <p class="mb-1">
+                                            <span class="badge bg-secondary">{{ transaction.category.name }}</span>
+                                        </p>
+                                        <span class="{% if transaction.transaction_type == 'expense' %}text-danger{% else %}text-success{% endif %}">
+                                            {% if transaction.transaction_type == 'expense' %}-{% else %}+{% endif %}
+                                            ${{ transaction.amount|floatformat:2 }}
+                                        </span>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-receipt fa-3x text-muted mb-3"></i>
+                            <p>No recent transactions found.</p>
+                            <a href="{% url 'add_transaction' %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus"></i> Add Transaction
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}Confirm Delete - Personal Finance Tracker{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card shadow">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Confirm Delete</h4>
+                </div>
+                <div class="card-body">
+                    <p>Are you sure you want to delete this record?</p>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                        {% if object|default_if_none:'' == 'category' %}
+                            <a href="{% url 'category_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                        {% elif object|default_if_none:'' == 'transaction' %}
+                            <a href="{% url 'transaction_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
 from  django.utils import timezone
 from datetime import datetime, timedelta
-from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt, use
 import io
 import base64
 import pandas as pd
@@ -13,6 +13,8 @@ from decimal import Decimal
 
 from .models import Category, Transaction
 from .forms import CategoryForm, TransactionForm, DateRangeFilterForm
+
+use('Agg')
 
 #Dashboard view
 @login_required
